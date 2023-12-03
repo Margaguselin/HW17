@@ -30,49 +30,33 @@ public class HttpService {
     public List<Drink> getRandomCocktail(){
         logger.info("Get random cocktail request started");
         URI uri = URI.create(domain + BASE_PATH + "/random.php");
-        HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
-
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("Get random cocktail response is" + response.body());
-            JsonNode node = mapper.readValue(response.body(), JsonNode.class);
-            JsonNode drinks = node.get("drinks");
-            return mapper.readerForListOf(Drink.class).readValue(drinks);
-        } catch (Exception e) {
-            logger.error("Error getting random cocktail");
-            throw new RuntimeException(e);
-        }
+        return getCocktails(uri);
     }
+
     public List<Drink> getCocktailByName(String name){
         logger.info("Get cocktail by name started and name is " + name);
         URI uri = URI.create(domain + BASE_PATH + "/search.php?s=" + name);
         HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
-        try {
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("Get cocktail by name response is" + response.body());
-            JsonNode node = mapper.readValue(response.body(), JsonNode.class);
-            JsonNode drinks = node.get("drinks");
-            return mapper.readerForListOf(Drink.class).readValue(drinks);
-        } catch (Exception e) {
-            logger.error("Error get by name " + name);
-            throw new RuntimeException(e);
-        }
-
+        return getCocktails(uri);
     }
 
     public List<Drink> getCocktailByFirstLetter(String letter){
         logger.info("Get cocktail by first letter is " + letter);
         URI uri = URI.create(domain + BASE_PATH + "/search.php?f=" + letter);
+        return getCocktails(uri);
+    }
+
+    public  List<Drink> getCocktails(URI uri) {
         HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
         try {
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            logger.info("Get cocktail by first letter is" + response.body());
+            logger.info("Get cocktails response is" + response.body());
             JsonNode node = mapper.readValue(response.body(), JsonNode.class);
             JsonNode drinks = node.get("drinks");
             return mapper.readerForListOf(Drink.class).readValue(drinks);
 
         } catch (Exception e) {
-            logger.error("Error get by first letter");
+            logger.error("Error getting cocktails");
             throw new RuntimeException(e);
         }
     }
